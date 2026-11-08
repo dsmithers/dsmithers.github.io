@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dylan J. Smithers</title>
+<meta name="description" content="Dylan J. Smithers: Lead Software Engineer in cloud security and data protection. Career, results and personal projects.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: fixed chapter bar; navy hero with a live "guardrail" field and a stat strip; four numbered chapters
+   that rise into view; a career line that fills as you scroll; an interactive diagram of the home lab. */
+:root {
+  --bg: #f5f7fa; --surface: #ffffff; --ink: #18222d; --muted: #5a6774; --line: #d6dee7;
+  --navy: #1b3254; --navy-2: #24426b; --on-navy: #ffffff; --on-navy-soft: #b7c8dc;
+  --accent: #2c6aa0; --glow: #7fb0e0; --warn: #e0875a; --chip: #e7eef6;
+  --bar: rgba(245,247,250,.82);
+  --ease: cubic-bezier(.2,.7,.1,1);
+  --body: Lato, "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --gutter: max(20px, env(safe-area-inset-left));
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e141b; --surface: #16202a; --ink: #e4e9ef; --muted: #98a6b4; --line: #283543;
+    --navy: #13253f; --navy-2: #1c3456; --on-navy: #ffffff; --on-navy-soft: #b7c8dc;
+    --accent: #8fbbe6; --glow: #8fbbe6; --warn: #eb9a70; --chip: #1f2c3a;
+    --bar: rgba(14,20,27,.8);
+    color-scheme: dark;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6; }
+a { color: var(--accent); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: var(--gutter); padding-right: max(20px, env(safe-area-inset-right)); }
+.skip { position: absolute; left: -999px; top: 8px; background: var(--surface); padding: 8px 12px; z-index: 100; }
+.skip:focus { left: 12px; }
+
+/* ---------- top bar ---------- */
+.topbar { position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top); transition: background .4s, border-color .4s, backdrop-filter .4s; border-bottom: 1px solid transparent; }
+.topbar .wrap { display: flex; align-items: center; gap: 22px; height: 60px; }
+.mark { font-weight: 900; letter-spacing: .22em; text-decoration: none; color: var(--on-navy); font-size: 15px; white-space: nowrap; transition: color .4s; }
+.chapters { display: flex; gap: 4px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+.chapters::-webkit-scrollbar { display: none; }
+.chapters a { font-family: var(--mono); font-size: 13px; text-decoration: none; color: var(--on-navy-soft); padding: 6px 10px; border-radius: 999px; white-space: nowrap; transition: color .25s, background .25s; }
+.chapters a span { opacity: .6; margin-right: 6px; }
+.chapters a:hover { color: var(--on-navy); }
+.topbar.scrolled { background: var(--bar); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); border-color: var(--line); }
+.topbar.scrolled .mark { color: var(--ink); }
+.topbar.scrolled .chapters a { color: var(--muted); }
+.topbar.scrolled .chapters a:hover { color: var(--ink); }
+.chapters a.active, .topbar.scrolled .chapters a.active { color: var(--on-navy); background: var(--accent); }
+@media (prefers-color-scheme: dark) { .chapters a.active, .topbar.scrolled .chapters a.active { color: #0e141b; } }
+
+/* ---------- hero ---------- */
+.hero { position: relative; background: var(--navy); color: var(--on-navy); overflow: hidden; }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero .wrap { position: relative; padding-block: calc(120px + env(safe-area-inset-top)) 40px; }
+.eyebrow { font-family: var(--mono); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--glow); }
+.hero h1 { margin: 14px 0 0; font-size: clamp(36px, 7.4vw, 76px); font-weight: 900; letter-spacing: .12em; line-height: 1.02; text-transform: uppercase; text-wrap: balance; }
+.hero .deck { margin: 18px 0 0; max-width: 34ch; font-size: clamp(20px, 2.8vw, 28px); line-height: 1.3; color: var(--on-navy-soft); }
+.hero .deck em { color: var(--on-navy); }
+.hero .links { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 26px; font-size: 15px; }
+.hero .links a { color: var(--on-navy); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--glow); padding-bottom: 1px; }
+.hero .links span { color: var(--on-navy-soft); }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); margin-top: 64px; border-top: 1px solid rgba(255,255,255,.18); }
+.stat { padding: 18px 16px 4px 0; }
+.stat b { display: block; font-size: clamp(26px, 4vw, 40px); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat span { display: block; margin-top: 6px; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--on-navy-soft); }
+.legend { margin-top: 22px; font-family: var(--mono); font-size: 12px; color: var(--on-navy-soft); display: flex; gap: 18px; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+
+/* ---------- chapters ---------- */
+section.chapter { padding-block: 96px 24px; }
+.chead { display: grid; grid-template-columns: 64px minmax(0,1fr); gap: 0 12px; margin-bottom: 34px; }
+.num { font-family: var(--mono); font-size: 14px; color: var(--accent); padding-top: 12px; }
+.chead h2 { margin: 0; font-size: clamp(30px, 4.6vw, 46px); line-height: 1.08; font-weight: 900; text-wrap: balance; }
+.chead h2 em { display: block; font-weight: 400; color: var(--accent); }
+.chead .rule { grid-column: 2; height: 2px; background: var(--line); margin-top: 18px; position: relative; overflow: hidden; }
+.chead .rule::after { content: ""; position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 1.4s var(--ease) .2s; }
+.chead.in .rule::after { transform: scaleX(1); }
+.body { margin-left: 76px; }
+p { margin: 0 0 16px; max-width: 64ch; }
+.lead { font-size: 21px; line-height: 1.5; }
+
+/* reveal on scroll */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ---------- about cards ---------- */
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-top: 26px; }
+.mini { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 14px; text-decoration: none; color: var(--ink); transition: transform .25s var(--ease), border-color .25s; }
+.mini:hover { transform: translateY(-3px); border-color: var(--accent); }
+.mini .k { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); }
+.mini b { display: block; font-size: 18px; margin: 4px 0 4px; }
+.mini p { font-size: 15px; color: var(--muted); margin: 0; }
+.mini .go { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 10px; display: block; }
+
+/* ---------- career line ---------- */
+.career { position: relative; padding: 0 0 0 34px; }
+.roles { list-style: none; margin: 0; padding: 0; }
+.career::before, .career .fill { content: ""; position: absolute; left: 6px; top: 6px; bottom: 30px; width: 2px; background: var(--line); }
+.career .fill { background: var(--accent); bottom: auto; height: 0; transition: height .08s linear; }
+.role { position: relative; padding-bottom: 38px; }
+.role::before { content: ""; position: absolute; left: -34px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 2.5px solid var(--line); transition: border-color .4s, background .4s; }
+.role.lit::before { border-color: var(--accent); background: var(--accent); }
+.when { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.role h3 { margin: 2px 0 0; font-size: 22px; }
+.role .org { font-weight: 700; color: var(--accent); font-size: 15px; margin-bottom: 8px; }
+.role ul { margin: 0; padding-left: 18px; list-style: disc; }
+.role li { margin-bottom: 5px; max-width: 66ch; }
+.role li::marker { color: var(--accent); }
+
+/* ---------- lab diagram ---------- */
+.scenarios { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 16px; }
+.scen { font: 600 14px var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer; transition: border-color .2s, background .2s, color .2s; }
+.scen:hover { border-color: var(--accent); }
+.scen[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.lab { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.stage { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; }
+.stage svg { display: block; width: 100%; min-width: 600px; height: auto; }
+.colhead { font: 600 10px var(--mono); letter-spacing: .14em; fill: var(--muted); }
+.group { fill: none; stroke: var(--accent); stroke-dasharray: 4 5; opacity: .55; }
+.grouplabel { font: 600 10px var(--mono); letter-spacing: .14em; fill: var(--accent); }
+.edge { fill: none; stroke: var(--line); stroke-width: 2; transition: stroke .3s, opacity .3s; }
+.edge.hot { stroke: var(--accent); }
+.lab.focus .edge:not(.hot) { opacity: .25; }
+.node rect { fill: var(--bg); stroke: var(--line); stroke-width: 1.5; rx: 8; transition: fill .3s, stroke .3s; }
+.node text { font: 700 12.5px var(--body); fill: var(--ink); pointer-events: none; }
+.node text.sub { font: 400 10px var(--mono); fill: var(--muted); }
+.node { cursor: pointer; }
+.node:hover rect, .node:focus-visible rect { stroke: var(--accent); }
+.node.sel rect { stroke: var(--accent); stroke-width: 2.5; }
+.lab.focus .node:not(.hot) { opacity: .45; }
+.node.hot rect { stroke: var(--accent); }
+.dot { fill: var(--accent); }
+.panel { position: sticky; top: 84px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; min-height: 260px; }
+.panel .k { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.panel h3 { margin: 4px 0 8px; font-size: 21px; }
+.panel p { font-size: 15.5px; }
+.panel .hint { font-family: var(--mono); font-size: 12px; color: var(--muted); margin: 0; }
+.alt { font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+/* ---------- project cards ---------- */
+.projects { display: grid; gap: 18px; margin-top: 40px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px 26px; }
+.card .k { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.card h3 { margin: 2px 0 6px; font-size: 22px; }
+.card ul { margin: 0 0 12px; padding-left: 18px; }
+.card li { margin-bottom: 5px; max-width: 66ch; }
+.card li::marker { color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 0; padding: 0; list-style: none; }
+.chips li { background: var(--chip); font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin: 0; }
+.jump { font: 600 13px var(--mono); color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; margin-top: 12px; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- skills ---------- */
+.cols { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px 32px; }
+.cols h3 { margin: 0 0 8px; font-family: var(--mono); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--accent); }
+.cols ul { margin: 0 0 20px; padding: 0; list-style: none; }
+.cols li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+
+footer { margin-top: 80px; padding-block: 30px calc(40px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+@media (max-width: 820px) {
+  .lab { grid-template-columns: minmax(0,1fr); }
+  .panel { position: static; min-height: 0; }
+  .trio, .cols { grid-template-columns: minmax(0,1fr); }
+  .body { margin-left: 0; }
+  .chead { grid-template-columns: 44px minmax(0,1fr); }
+  .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .mark { display: none; }
+  .chapters { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .chead .rule::after { transform: scaleX(1); transition: none; }
+  .mini, .career .fill { transition: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#about">Skip to content</a>
+
+<header class="topbar" id="topbar">
+  <div class="wrap">
+    <a class="mark" href="#top">D · J · S</a>
+    <nav class="chapters" aria-label="Chapters">
+      <a href="#about"><span>01</span>About</a>
+      <a href="#career"><span>02</span>Career</a>
+      <a href="#lab"><span>03</span>Home lab</a>
+      <a href="#skills"><span>04</span>Skills</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <canvas id="field" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="eyebrow">Lead Software Engineer · Cloud Security &amp; Data Protection</div>
+    <h1>Dylan J. Smithers</h1>
+    <p class="deck">I build the guardrails that keep data where it belongs, <em>at enterprise scale and at home.</em></p>
+    <div class="links">
+      <a href="mailto:smithers.dylan@outlook.com">smithers.dylan@outlook.com</a>
+      <a href="https://github.com/dsmithers">GitHub</a>
+      <span>Arizona</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>8 yrs</b><span>cloud engineering</span></div>
+      <div class="stat"><b>100K+</b><span>unused endpoints removed</span></div>
+      <div class="stat"><b>7-fig</b><span>annual savings</span></div>
+      <div class="stat"><b>3</b><span>certifications</span></div>
+    </div>
+    <div class="legend" aria-hidden="true"><span><i style="background:var(--glow)"></i>traffic</span><span><i style="background:var(--warn)"></i>sensitive data, stopped at the guardrail</span></div>
+  </div>
+</div>
+
+<main>
+  <section class="chapter" id="about">
+    <div class="wrap">
+      <div class="chead reveal"><div class="num">01</div><h2>From a security degree <em>to leading a team.</em></h2><div class="rule"></div></div>
+      <div class="body">
+        <p class="lead reveal">I studied cyber intelligence and security, interned as a security analyst, and came into software engineering through Capital One's developer academy, without a computer science degree. Eight years later I'm a lead engineer and the acting lead of a data protection team.</p>
+        <p class="reveal">I'm the person teams come to when a cloud security problem crosses team lines and nobody owns it. I like turning a sprawling blocker into a plan with steps, then building the tooling so the next team can solve it themselves.</p>
+        <div class="trio">
+          <a class="mini reveal" href="#career"><span class="k">At work</span><b>Cloud data protection</b><p>Data loss prevention, logging and security tooling on AWS.</p><span class="go">02 · Career ↓</span></a>
+          <a class="mini reveal" href="#lab"><span class="k">At home</span><b>A home lab that runs the house</b><p>A wall dashboard, home automation and the server behind them.</p><span class="go">03 · Home lab ↓</span></a>
+          <a class="mini reveal" href="#skills"><span class="k">Credentials</span><b>AWS &amp; Security+</b><p>Two AWS certifications, CompTIA Security+ and a B.S. in security.</p><span class="go">04 · Skills ↓</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="career">
+    <div class="wrap">
+      <div class="chead reveal"><div class="num">02</div><h2>Eight years, <em>five roles.</em></h2><div class="rule"></div></div>
+      <div class="body">
+        <div class="career" id="careerline">
+          <span class="fill" aria-hidden="true"></span>
+          <ol class="roles">
+          <li class="role reveal">
+            <div class="when">2024 – Present</div>
+            <h3>Lead Software Engineer</h3>
+            <div class="org">Capital One · Acting Team Lead, Data Protection since 2026</div>
+            <ul>
+              <li>Lead the data protection team as acting team lead and product owner; halved work in progress and raised throughput about 70%.</li>
+              <li>Own the enterprise's centralized cloud logging platform across five regions, and wrote its first architecture decision record.</li>
+              <li>Architected the move from AWS Security Hub to Amazon Security Lake, including the cost case that secured funding.</li>
+              <li>Built a self-service API for private AWS network endpoints, cutting manual requests about 50%.</li>
+            </ul>
+          </li>
+          <li class="role reveal">
+            <div class="when">2020 – 2024</div>
+            <h3>Senior Software Engineer</h3>
+            <div class="org">Capital One · Cloud Data Loss Prevention</div>
+            <ul>
+              <li>The enterprise expert on AWS VPC endpoints and PrivateLink, enabling new AWS services across hundreds of accounts.</li>
+              <li>Closed a data loss prevention gap for S3, and worked with AWS to ship the features that fixed a cross-region limitation.</li>
+              <li>Removed more than 100,000 unused endpoints, saving seven figures a year.</li>
+            </ul>
+          </li>
+          <li class="role reveal">
+            <div class="when">2019 – 2020</div>
+            <h3>Software Engineer</h3>
+            <div class="org">Capital One · Cloud Bastion Platform</div>
+            <ul><li>Took sole ownership of the cloud bastion fleet within months; automated its rebuilds in Python and extended it to Google Cloud.</li></ul>
+          </li>
+          <li class="role reveal">
+            <div class="when">2018 – 2019</div>
+            <h3>Associate Software Engineer</h3>
+            <div class="org">Capital One · Developer Academy, then Risk Management</div>
+            <ul><li>Six-month software engineering program, then data pipelines and monitoring for a risk management application on AWS.</li></ul>
+          </li>
+          <li class="role reveal">
+            <div class="when">2016 – 2017</div>
+            <h3>Security Analyst Intern</h3>
+            <div class="org">Arizona Public Service</div>
+            <ul><li>Built an intrusion detection proof of concept with Snort and hardened weak machine-account passwords.</li></ul>
+          </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="lab">
+    <div class="wrap">
+      <div class="chead reveal"><div class="num">03</div><h2>The home lab, <em>and what runs on it.</em></h2><div class="rule"></div></div>
+      <div class="body">
+        <p class="lead reveal">Off the clock I build for my family: a dashboard on the wall, a house that handles its own routines, and Mecca, the server that runs it all. Pick a scenario, or tap any box.</p>
+        <div class="scenarios reveal" role="group" aria-label="Scenarios">
+          <button class="scen" type="button" data-scen="morning" aria-pressed="false">The morning check</button>
+          <button class="scen" type="button" data-scen="touchdown" aria-pressed="false">A Packers touchdown</button>
+          <button class="scen" type="button" data-scen="away" aria-pressed="false">Away from home</button>
+          <button class="scen" type="button" data-scen="all" aria-pressed="true">Everything</button>
+        </div>
+        <div class="lab reveal" id="labgrid">
+          <div class="stage"><svg id="labsvg" viewBox="0 0 760 330" role="img" aria-labelledby="labtitle"><title id="labtitle">Diagram of the home lab: screens connect to the dashboard server on Mecca, which reads calendars and the weather station and talks to Home Assistant, which controls the lights; a phone away from home reaches Home Assistant through Tailscale.</title></svg></div>
+          <aside class="panel" id="panel" aria-live="polite"></aside>
+        </div>
+        <p class="alt reveal">The same thing in words: every screen in the house talks only to the dashboard server, which holds the passwords. Home Assistant controls the devices. Away from home, a private Tailscale network is the only way in.</p>
+
+        <div class="projects">
+          <article class="card reveal">
+            <div class="k">Software · 2026</div>
+            <h3>Family Dashboard</h3>
+            <p>A self-hosted, touch-first dashboard for every screen in our house. The family calendar comes first, then the weather from our own station, what's playing on the speakers, the thermostat, the state of the house with one-tap scenes, and the cameras.</p>
+            <ul>
+              <li>A small server in Docker holds every credential and pushes live updates to all screens at once, so no screen ever stores a password.</li>
+              <li>Reachable only on the home network.</li>
+              <li>Built spec-first with AI-assisted engineering and covered by more than 400 automated tests.</li>
+            </ul>
+            <ul class="chips"><li>Node.js</li><li>Docker</li><li>Home Assistant</li><li>CalDAV</li><li>AI-assisted engineering</li></ul>
+            <button class="jump" type="button" data-node="dash">See it in the diagram ↑</button>
+          </article>
+          <article class="card reveal">
+            <div class="k">Home automation</div>
+            <h3>A House That Runs Itself (Mostly)</h3>
+            <ul>
+              <li>One-tap routines for mornings, coming home, bedtime and good night.</li>
+              <li>Garage lights that follow sunrise and sunset and change color for holidays and game days.</li>
+              <li>Colored lights that celebrate Packers touchdowns and Brewers home runs, then put themselves back.</li>
+              <li>A guest mode that keeps every automation out of the guest room while someone is staying with us.</li>
+            </ul>
+            <ul class="chips"><li>Home Assistant</li><li>YAML</li><li>Matter &amp; Thread</li><li>HomeKit</li></ul>
+            <button class="jump" type="button" data-node="ha">See it in the diagram ↑</button>
+          </article>
+          <article class="card reveal">
+            <div class="k">Infrastructure</div>
+            <h3>Mecca, the Home Server</h3>
+            <ul>
+              <li>An Unraid server on a 16-core AMD EPYC with 256 GB of memory.</li>
+              <li>Runs the media library, the Home Assistant virtual machine and the dashboard's containers.</li>
+              <li>Keeps my notes in sync across every computer, and holds the family's private files on shares that never leave the house.</li>
+            </ul>
+            <ul class="chips"><li>Unraid</li><li>Docker</li><li>Virtual machines</li><li>Tailscale</li><li>Syncthing</li></ul>
+            <button class="jump" type="button" data-node="media">See it in the diagram ↑</button>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="skills">
+    <div class="wrap">
+      <div class="chead reveal"><div class="num">04</div><h2>Tools <em>of the trade.</em></h2><div class="rule"></div></div>
+      <div class="body cols">
+        <div class="reveal">
+          <h3>Cloud &amp; security</h3>
+          <ul>
+            <li>AWS VPC, PrivateLink, Route 53</li>
+            <li>Security Hub, Security Lake, GuardDuty</li>
+            <li>Data loss prevention</li>
+            <li>Centralized cloud logging</li>
+          </ul>
+        </div>
+        <div class="reveal">
+          <h3>Building</h3>
+          <ul>
+            <li>Python, Go</li>
+            <li>Terraform, CloudFormation</li>
+            <li>Docker, Node.js</li>
+            <li>Agile &amp; product ownership</li>
+          </ul>
+        </div>
+        <div class="reveal">
+          <h3>Credentials</h3>
+          <ul>
+            <li>AWS Solutions Architect – Associate</li>
+            <li>AWS Developer – Associate</li>
+            <li>CompTIA Security+</li>
+            <li>B.S. Cyber Intelligence &amp; Security, Embry-Riddle, Magna Cum Laude</li>
+            <li>Eagle Scout</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap"><span>© 2026 Dylan J. Smithers</span><a href="#top">Back to the top ↑</a></div>
+</footer>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  /* top bar: frosted after scrolling; active chapter highlight */
+  const topbar = $("#topbar");
+  const onScroll = () => topbar.classList.toggle("scrolled", scrollY > 40);
+  addEventListener("scroll", onScroll, { passive: true }); onScroll();
+  const links = $$(".chapters a");
+  const secObs = new IntersectionObserver((ents) => ents.forEach((e) => {
+    if (e.isIntersecting) links.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id));
+  }), { rootMargin: "-45% 0px -50% 0px" });
+  $$("main section[id]").forEach((s) => secObs.observe(s));
+
+  /* reveal on scroll */
+  const io = new IntersectionObserver((ents) => ents.forEach((e) => {
+    if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }), { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+  $$(".reveal").forEach((el) => calm ? el.classList.add("in") : io.observe(el));
+
+  /* career line fills as you scroll */
+  const line = $("#careerline"), fill = $(".fill", line), roles = $$(".role", line);
+  let ticking = false;
+  const paint = () => {
+    ticking = false;
+    const r = line.getBoundingClientRect(), mark = innerHeight * 0.6;
+    const h = Math.max(0, Math.min(r.height - 36, mark - r.top));
+    fill.style.height = h + "px";
+    roles.forEach((li) => li.classList.toggle("lit", li.getBoundingClientRect().top + 12 < mark));
+  };
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }, { passive: true });
+  addEventListener("resize", paint); paint();
+
+  /* hero: a field of traffic crossing a guardrail; sensitive packets stop at it */
+  const cv = $("#field"), ctx = cv.getContext("2d"), hero = $(".hero");
+  let W = 0, H = 0, dpr = 1, parts = [], heroOn = true;
+  const size = () => {
+    dpr = Math.min(2, devicePixelRatio || 1); W = hero.clientWidth; H = hero.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(Math.min(90, W / 14));
+    parts = Array.from({ length: n }, () => spawn(Math.random() * W));
+  };
+  const lanes = 14;
+  const spawn = (x) => ({ x, lane: Math.floor(Math.random() * lanes), v: 0.35 + Math.random() * 0.8, bad: Math.random() < 0.18, a: 1 });
+  const gate = () => W * 0.78;
+  const draw = (move) => {
+    ctx.clearRect(0, 0, W, H);
+    const glow = css("--glow"), warn = css("--warn");
+    const g = gate();
+    ctx.strokeStyle = glow; ctx.globalAlpha = 0.28; ctx.lineWidth = 1.5; ctx.setLineDash([3, 7]);
+    ctx.beginPath(); ctx.moveTo(g, 0); ctx.lineTo(g, H); ctx.stroke(); ctx.setLineDash([]);
+    for (const p of parts) {
+      const y = (p.lane + 0.5) * (H / lanes);
+      if (move) {
+        if (p.bad && p.x > g - 10) { p.x = g - 10; p.a -= 0.012; } else p.x += p.v;
+        if (p.x > W + 10 || p.a <= 0) Object.assign(p, spawn(-10));
+      }
+      ctx.globalAlpha = 0.12 * p.a; ctx.strokeStyle = p.bad ? warn : glow; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(Math.max(0, p.x - 40), y); ctx.lineTo(p.x, y); ctx.stroke();
+      ctx.globalAlpha = 0.75 * p.a; ctx.fillStyle = p.bad ? warn : glow;
+      ctx.beginPath(); ctx.arc(p.x, y, p.bad ? 2.6 : 2, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  };
+  new IntersectionObserver(([e]) => (heroOn = e.isIntersecting)).observe(hero);
+  const loop = () => { if (heroOn) draw(true); requestAnimationFrame(loop); };
+  size(); addEventListener("resize", () => { size(); if (calm) draw(false); });
+  if (calm) { for (let i = 0; i < 400; i++) parts.forEach((p) => { p.x += p.v; if (p.x > W) p.x -= W; }); draw(false); } else loop();
+
+  /* home lab diagram */
+  const NS = "http://www.w3.org/2000/svg", svg = $("#labsvg");
+  const el = (t, a = {}, parent = svg) => { const n = document.createElementNS(NS, t); for (const k in a) n.setAttribute(k, a[k]); parent.appendChild(n); return n; };
+  const NW = 150, NH = 48;
+  const N = {
+    panel:  { x: 20,  y: 40,  t: "Wall panel", s: "touch screen", k: "Screen",
+              p: "A touch screen on the wall that shows the family calendar first. Like every screen, it holds no passwords; it only knows the dashboard's address." },
+    ipad:   { x: 20,  y: 140, t: "iPads & laptops", s: "any browser at home", k: "Screens",
+              p: "Any browser on the home network gets the same live dashboard, laid out for its screen." },
+    phone:  { x: 20,  y: 240, t: "Phone, away", s: "outside the house", k: "Remote",
+              p: "Away from home, my phone still reaches Home Assistant and the server, without opening them to the internet." },
+    ts:     { x: 210, y: 240, t: "Tailscale", s: "private network", k: "Remote access",
+              p: "A private, encrypted network between my own devices. It's the only way in from outside, so home services never face the public internet." },
+    dash:   { x: 400, y: 40,  t: "Dashboard server", s: "Node.js · Docker", k: "Family Dashboard",
+              p: "Holds every credential, gathers calendars, weather and the state of the house, and pushes live updates to every screen at once. Built spec-first with AI-assisted engineering and 400+ automated tests." },
+    ha:     { x: 400, y: 140, t: "Home Assistant", s: "virtual machine", k: "Home automation",
+              p: "The hub for our HomeKit, Matter and Thread devices. It runs the routines: mornings, bedtime, sunrise and sunset garage lights, guest mode, and the game-day light show." },
+    media:  { x: 400, y: 240, t: "Media & file sync", s: "Unraid shares", k: "Mecca",
+              p: "Mecca also runs the media library, keeps my notes in sync across every computer, and holds the family's private files on shares that never leave the house." },
+    cal:    { x: 590, y: 40,  t: "Family calendars", s: "CalDAV", k: "Data source",
+              p: "The family's calendars, read over CalDAV so the wall panel always shows today first." },
+    wx:     { x: 590, y: 140, t: "Weather station", s: "our own station", k: "Data source",
+              p: "Our own weather station, read directly on the home network, plus the forecast." },
+    lights: { x: 590, y: 240, t: "Lights & devices", s: "HomeKit · Matter", k: "Devices",
+              p: "Lights, shades, fans and remotes. Home Assistant drives them, and puts them back the way they were after a celebration." },
+  };
+  const E = [
+    ["panel", "dash"], ["ipad", "dash"], ["phone", "ts"], ["ts", "ha"], ["ts", "media"],
+    ["dash", "cal"], ["dash", "wx"], ["dash", "ha"], ["ha", "lights"],
+  ];
+  const SC = {
+    all:       { e: E.map((x) => x.join("-")), k: "The whole picture", h: "How it fits together",
+                 p: "Screens talk to the dashboard server, the server gathers what they show, and Home Assistant runs the house. Pick a scenario above, or tap a box for details." },
+    morning:   { e: ["panel-dash", "dash-cal", "dash-wx"], k: "Scenario", h: "The morning check",
+                 p: "Someone walks past the wall panel. The dashboard server has already pulled today's calendar and the weather from our station, so the answer is on the screen before they ask." },
+    touchdown: { e: ["dash-ha", "ha-lights"], k: "Scenario", h: "A Packers touchdown",
+                 p: "Home Assistant sees the score change and the colored lights dance in team colors for a few seconds, then go back to exactly how they were. It skips the show after bedtime." },
+    away:      { e: ["phone-ts", "ts-ha", "ts-media"], k: "Scenario", h: "Away from home",
+                 p: "From outside the house, my phone joins the private Tailscale network to reach Home Assistant and the server. Nothing is opened to the public internet for it." },
+  };
+  const right = (n) => [n.x + NW, n.y + NH / 2], left = (n) => [n.x, n.y + NH / 2];
+  const pathFor = ([a, b]) => {
+    const A = N[a], B = N[b];
+    if (A.x === B.x) return `M${A.x + NW / 2},${A.y + NH} L${B.x + NW / 2},${B.y}`;
+    const [x1, y1] = right(A), [x2, y2] = left(B), mx = (x1 + x2) / 2;
+    return `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;
+  };
+  [["SCREENS", 95], ["REMOTE", 285], ["MECCA · UNRAID", 475], ["SOURCES & DEVICES", 665]].forEach(([t, x]) => {
+    const c = el("text", { x, y: 24, "text-anchor": "middle", class: "colhead" }); c.textContent = t;
+  });
+  el("rect", { x: 386, y: 32, width: NW + 28, height: 266, rx: 12, class: "group" });
+  const edges = {};
+  E.forEach((pair) => { const id = pair.join("-"); edges[id] = el("path", { d: pathFor(pair), class: "edge" }); });
+  const dotLayer = el("g");
+  const nodes = {};
+  for (const id in N) {
+    const n = N[id];
+    const g = el("g", { class: "node", tabindex: "0", role: "button", "aria-label": n.t });
+    el("rect", { x: n.x, y: n.y, width: NW, height: NH }, g);
+    const t = el("text", { x: n.x + 12, y: n.y + 21 }, g); t.textContent = n.t;
+    const s = el("text", { x: n.x + 12, y: n.y + 37, class: "sub" }, g); s.textContent = n.s;
+    g.addEventListener("click", () => selectNode(id));
+    g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectNode(id); } });
+    nodes[id] = g;
+  }
+  const panel = $("#panel"), grid = $("#labgrid");
+  let active = [];
+  const setPanel = (k, h, p, hint) => { panel.innerHTML = ""; const a = document.createElement("div"); a.className = "k"; a.textContent = k; const b = document.createElement("h3"); b.textContent = h; const c = document.createElement("p"); c.textContent = p; panel.append(a, b, c); if (hint) { const d = document.createElement("p"); d.className = "hint"; d.textContent = hint; panel.append(d); } };
+  const scenario = (key) => {
+    const sc = SC[key]; active = sc.e;
+    $$(".scen").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.scen === key)));
+    grid.classList.toggle("focus", key !== "all");
+    for (const id in edges) edges[id].classList.toggle("hot", active.includes(id));
+    for (const id in nodes) { nodes[id].classList.remove("sel"); nodes[id].classList.toggle("hot", active.some((e) => e.split("-").includes(id))); }
+    setPanel(sc.k, sc.h, sc.p, "Tap any box for details.");
+    resetDots();
+  };
+  const selectNode = (id) => {
+    const n = N[id];
+    active = E.map((x) => x.join("-")).filter((e) => e.split("-").includes(id));
+    $$(".scen").forEach((b) => b.setAttribute("aria-pressed", "false"));
+    grid.classList.add("focus");
+    for (const e in edges) edges[e].classList.toggle("hot", active.includes(e));
+    for (const k in nodes) { nodes[k].classList.toggle("sel", k === id); nodes[k].classList.toggle("hot", k === id || active.some((e) => e.split("-").includes(k))); }
+    setPanel(n.k, n.t, n.p);
+    resetDots();
+  };
+  $$(".scen").forEach((b) => b.addEventListener("click", () => scenario(b.dataset.scen)));
+  $$(".jump").forEach((b) => b.addEventListener("click", () => { $("#labgrid").scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "center" }); selectNode(b.dataset.node); }));
+
+  /* dots travel along the active connections */
+  let dots = [], labOn = false;
+  const resetDots = () => {
+    dotLayer.innerHTML = "";
+    dots = active.flatMap((id) => [0, 0.5].map((off) => ({ p: edges[id], len: edges[id].getTotalLength(), t: off, c: el("circle", { r: 3.2, class: "dot" }, dotLayer) })));
+    placeDots(0);
+  };
+  const placeDots = (dt) => dots.forEach((d) => { d.t = (d.t + dt) % 1; const pt = d.p.getPointAtLength(d.t * d.len); d.c.setAttribute("cx", pt.x); d.c.setAttribute("cy", pt.y); });
+  new IntersectionObserver(([e]) => (labOn = e.isIntersecting), { rootMargin: "100px" }).observe(grid);
+  let last = 0;
+  const tick = (now) => { const dt = Math.min(50, now - (last || now)); last = now; if (labOn) placeDots(dt / 2600); requestAnimationFrame(tick); };
+  scenario("all");
+  if (!calm) requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
