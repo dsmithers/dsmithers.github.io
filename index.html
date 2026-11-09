@@ -119,9 +119,9 @@ p { margin: 0 0 16px; max-width: 64ch; }
 .scen { font: 600 14px var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer; transition: border-color .2s, background .2s, color .2s; }
 .scen:hover { border-color: var(--accent); }
 .scen[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
-.lab { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.lab { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
 .stage { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; }
-.stage svg { display: block; width: 100%; min-width: 600px; height: auto; }
+.stage svg { display: block; width: 100%; height: auto; }
 .colhead { font: 600 10px var(--mono); letter-spacing: .14em; fill: var(--muted); }
 .group { fill: none; stroke: var(--accent); stroke-dasharray: 4 5; opacity: .55; }
 .grouplabel { font: 600 10px var(--mono); letter-spacing: .14em; fill: var(--accent); }
@@ -137,7 +137,7 @@ p { margin: 0 0 16px; max-width: 64ch; }
 .lab.focus .node:not(.hot) { opacity: .45; }
 .node.hot rect { stroke: var(--accent); }
 .dot { fill: var(--accent); }
-.panel { position: sticky; top: 84px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; min-height: 260px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
 .panel .k { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
 .panel h3 { margin: 4px 0 8px; font-size: 21px; }
 .panel p { font-size: 15.5px; }
@@ -166,8 +166,7 @@ footer { margin-top: 80px; padding-block: 30px calc(40px + env(safe-area-inset-b
 footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 
 @media (max-width: 820px) {
-  .lab { grid-template-columns: minmax(0,1fr); }
-  .panel { position: static; min-height: 0; }
+  .stage svg { min-width: 600px; }
   .trio, .cols { grid-template-columns: minmax(0,1fr); }
   .body { margin-left: 0; }
   .chead { grid-template-columns: 44px minmax(0,1fr); }
