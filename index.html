@@ -299,10 +299,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <button class="scen" type="button" data-scen="all" aria-pressed="true">Everything</button>
         </div>
         <div class="lab reveal" id="labgrid">
-          <div class="stage"><svg id="labsvg" viewBox="0 0 760 330" role="img" aria-labelledby="labtitle"><title id="labtitle">Diagram of the home lab: screens connect to the dashboard server on Mecca, which reads calendars and the weather station and talks to Home Assistant, which controls the lights; a phone away from home reaches Home Assistant through Tailscale.</title></svg></div>
+          <div class="stage"><svg id="labsvg" viewBox="0 0 760 330" role="img" aria-labelledby="labtitle"><title id="labtitle">Diagram of the home lab: screens connect to the dashboard server on Mecca, which reads calendars and the weather station and talks to Home Assistant; Home Assistant follows live game scores and controls the lights; a phone away from home reaches the server through Tailscale.</title></svg></div>
           <aside class="panel" id="panel" aria-live="polite"></aside>
         </div>
-        <p class="alt reveal">The same thing in words: every screen in the house talks only to the dashboard server, which holds the passwords. Home Assistant controls the devices. Away from home, a private Tailscale network is the only way in.</p>
+        <p class="alt reveal">The same thing in words: every screen in the house talks only to the dashboard server, which holds the passwords. Home Assistant controls the devices. Nothing at home is opened to the internet. Away from home, I connect through a private Tailscale network.</p>
 
         <div class="projects">
           <article class="card reveal">
@@ -468,9 +468,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     ipad:   { x: 20,  y: 140, t: "iPads & laptops", s: "any browser at home", k: "Screens",
               p: "Any browser on the home network gets the same live dashboard, laid out for its screen." },
     phone:  { x: 20,  y: 240, t: "Phone, away", s: "outside the house", k: "Remote",
-              p: "Away from home, my phone still reaches Home Assistant and the server, without opening them to the internet." },
+              p: "Away from home, my phone still reaches the server, without opening it to the internet." },
     ts:     { x: 210, y: 240, t: "Tailscale", s: "private network", k: "Remote access",
-              p: "A private, encrypted network between my own devices. It's the only way in from outside, so home services never face the public internet." },
+              p: "A private, encrypted network between my own devices. Away from home it's how I reach the server, and nothing at home is opened to the public internet." },
     dash:   { x: 400, y: 40,  t: "Dashboard server", s: "Node.js · Docker", k: "Family Dashboard",
               p: "Holds every credential, gathers calendars, weather and the state of the house, and pushes live updates to every screen at once. Built spec-first with AI-assisted engineering and 400+ automated tests." },
     ha:     { x: 400, y: 140, t: "Home Assistant", s: "virtual machine", k: "Home automation",
@@ -479,30 +479,32 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               p: "Mecca also runs the media library, keeps my notes in sync across every computer, and holds the family's private files on shares that never leave the house." },
     cal:    { x: 590, y: 40,  t: "Family calendars", s: "CalDAV", k: "Data source",
               p: "The family's calendars, read over CalDAV so the wall panel always shows today first." },
-    wx:     { x: 590, y: 140, t: "Weather station", s: "our own station", k: "Data source",
+    wx:     { x: 590, y: 110, t: "Weather station", s: "our own station", k: "Data source",
               p: "Our own weather station, read directly on the home network, plus the forecast." },
-    lights: { x: 590, y: 240, t: "Lights & devices", s: "HomeKit · Matter", k: "Devices",
+    scores: { x: 590, y: 180, t: "Live scores", s: "game-day feed", k: "Data source",
+              p: "Live scores for the Packers and Brewers, checked every few seconds during a game. A touchdown or a home run is what starts the light show." },
+    lights: { x: 590, y: 250, t: "Lights & devices", s: "HomeKit · Matter", k: "Devices",
               p: "Lights, shades, fans and remotes. Home Assistant drives them, and puts them back the way they were after a celebration." },
   };
   const E = [
-    ["panel", "dash"], ["ipad", "dash"], ["phone", "ts"], ["ts", "ha"], ["ts", "media"],
-    ["dash", "cal"], ["dash", "wx"], ["dash", "ha"], ["ha", "lights"],
+    ["panel", "dash"], ["ipad", "dash"], ["phone", "ts"], ["ts", "media"],
+    ["dash", "cal"], ["dash", "wx"], ["dash", "ha"], ["scores", "ha"], ["ha", "lights"],
   ];
   const SC = {
     all:       { e: E.map((x) => x.join("-")), k: "The whole picture", h: "How it fits together",
                  p: "Screens talk to the dashboard server, the server gathers what they show, and Home Assistant runs the house. Pick a scenario above, or tap a box for details." },
     morning:   { e: ["panel-dash", "dash-cal", "dash-wx"], k: "Scenario", h: "The morning check",
                  p: "Someone walks past the wall panel. The dashboard server has already pulled today's calendar and the weather from our station, so the answer is on the screen before they ask." },
-    touchdown: { e: ["dash-ha", "ha-lights"], k: "Scenario", h: "A Packers touchdown",
-                 p: "Home Assistant sees the score change and the colored lights dance in team colors for a few seconds, then go back to exactly how they were. It skips the show after bedtime." },
-    away:      { e: ["phone-ts", "ts-ha", "ts-media"], k: "Scenario", h: "Away from home",
-                 p: "From outside the house, my phone joins the private Tailscale network to reach Home Assistant and the server. Nothing is opened to the public internet for it." },
+    touchdown: { e: ["scores-ha", "ha-lights"], k: "Scenario", h: "A Packers touchdown",
+                 p: "Home Assistant follows the live score, sees the touchdown and the colored lights dance in team colors for a few seconds, then go back to exactly how they were. It skips the show after bedtime." },
+    away:      { e: ["phone-ts", "ts-media"], k: "Scenario", h: "Away from home",
+                 p: "From outside the house, my phone joins the private Tailscale network to reach the server. Nothing is opened to the public internet for it." },
   };
   const right = (n) => [n.x + NW, n.y + NH / 2], left = (n) => [n.x, n.y + NH / 2];
   const pathFor = ([a, b]) => {
     const A = N[a], B = N[b];
     if (A.x === B.x) return `M${A.x + NW / 2},${A.y + NH} L${B.x + NW / 2},${B.y}`;
-    const [x1, y1] = right(A), [x2, y2] = left(B), mx = (x1 + x2) / 2;
+    const [x1, y1] = A.x < B.x ? right(A) : left(A), [x2, y2] = A.x < B.x ? left(B) : right(B), mx = (x1 + x2) / 2;
     return `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;
   };
   [["SCREENS", 95], ["REMOTE", 285], ["MECCA · UNRAID", 475], ["SOURCES & DEVICES", 665]].forEach(([t, x]) => {
