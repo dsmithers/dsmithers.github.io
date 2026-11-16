@@ -137,6 +137,20 @@ p { margin: 0 0 16px; max-width: 64ch; }
 .lab.focus .node:not(.hot) { opacity: .45; }
 .node.hot rect { stroke: var(--accent); }
 .dot { fill: var(--accent); }
+
+/* ---------- relay flow (inside the Coding Relay card) ---------- */
+.flow { margin: 18px 0 16px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px 12px 14px; }
+.flow svg { display: block; width: 100%; height: auto; }
+.flow .node rect { fill: var(--surface); }
+.flow .node { outline: none; }
+.flow .arrowhead { fill: var(--muted); }
+.flow .arrowhead.backhead { fill: var(--warn); }
+.flow .back { fill: none; stroke: var(--warn); stroke-width: 1.5; stroke-dasharray: 4 4; opacity: .75; transition: opacity .3s; }
+.flow .back.hot { opacity: 1; stroke-width: 2.2; }
+.flow .backlabel { font: 600 10px var(--mono); letter-spacing: .08em; fill: var(--warn); }
+.flow .dot.backdot { fill: var(--warn); }
+.flow figcaption { margin: 10px 6px 0; font-size: 15px; color: var(--muted); }
+.flow figcaption b { color: var(--ink); margin-right: 6px; }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
 .panel .k { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
 .panel h3 { margin: 4px 0 8px; font-size: 21px; }
@@ -344,6 +358,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="k">AI engineering · 2026</div>
             <h3>The Coding Relay</h3>
             <p>A relay race for AI-assisted coding. Each model has one job and hands the work on: one plans, one checks the plan, one writes the code, and others review it for bugs and security. Every run ends with a pull request that I review and merge myself.</p>
+            <figure class="flow" id="relayflow">
+              <svg id="relaysvg" role="img" aria-labelledby="relaytitle"><title id="relaytitle">Flow of the coding relay: the planner writes a spec; a local model checks the plan and its critique goes back to the planner; I read the spec and give the go-ahead; the coder writes the code; the tests run; four reviews check for bugs and security, and their findings go back to the planner for another lap; the relay ends in a pull request that I review and merge.</title></svg>
+              <figcaption id="relaycap"></figcaption>
+            </figure>
             <ul>
               <li>Separation of duties: only the coder can change code. Reviewers can send work back, and every fix, however small, goes back through the planner and round again.</li>
               <li>Every change starts as a written spec, committed before any code is written, so the specs grow with the project. Nothing merges without passing tests.</li>
@@ -573,6 +591,132 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const tick = (now) => { const dt = Math.min(50, now - (last || now)); last = now; if (labOn) placeDots(dt / 2600); requestAnimationFrame(tick); };
   scenario("all");
   if (!calm) requestAnimationFrame(tick);
+
+  /* coding relay flow: a baton moves through the stages; dashed lines send work back */
+  const rsvg = $("#relaysvg"), rcap = $("#relaycap"), rfig = $("#relayflow");
+  const RN = {
+    plan:   { t: "Planner",      s: "Claude · writes spec",
+              p: "Reads the code and writes the change as a spec: what changes, the scenarios it must pass, and the tasks, each with how it will be checked." },
+    check:  { t: "Plan check",   s: "local model, at home",
+              p: "An open-weights model running at home critiques the plan. Plans can describe the house, so they never leave it." },
+    go:     { t: "Go-ahead",     s: "me · reads the spec",
+              p: "The spec is committed to the repository first, so I read it myself. Nothing is built until I say go." },
+    code:   { t: "Coder",        s: "Claude · edits code",
+              p: "The only role allowed to change code. It follows the plan exactly, writes the tests, and ticks a task only when its check has passed." },
+    tests:  { t: "Tests",        s: "must all pass",
+              p: "The tests run on their own. A failure isn't patched on the spot: it goes back to the planner as a finding." },
+    review: { t: "Reviews",      s: "Claude & Codex",
+              p: "Four reviews of the whole change: Claude and OpenAI's Codex, each once for bugs and once for security. Codex runs in a sandbox, walled off from everything else." },
+    pr:     { t: "Pull request", s: "me · review & merge",
+              p: "The relay ends with a pull request. I review it and merge it myself." },
+  };
+  const RBACK = {
+    "check>plan":  { t: "Critique", p: "The plan check's critique goes back to the planner, who revises the plan." },
+    "review>plan": { t: "Findings", p: "Accepted findings go back to the planner as an amendment, and the change goes round again: two laps at most, unless I approve another." },
+  };
+  /* two hand-placed layouts: a snake of 4 + 3 when wide, one column on a phone */
+  const LAYOUTS = {
+    wide: { vb: [760, 238], w: 150,
+      at: { plan: [28, 60], check: [213, 60], go: [398, 60], code: [583, 60], tests: [583, 148], review: [398, 148], pr: [213, 148] },
+      back: { "check>plan": "M288,60 C288,24 103,24 103,60",
+              "review>plan": "M473,196 V214 Q473,224 463,224 H22 Q12,224 12,214 V94 Q12,84 22,84 H28" },
+      labels: [["critique, then revise", 195.5, 22], ["findings go back to the planner", 210, 216]] },
+    tall: { vb: [300, 470], w: 232,
+      at: { plan: [16, 14], check: [16, 80], go: [16, 146], code: [16, 212], tests: [16, 278], review: [16, 344], pr: [16, 410] },
+      back: { "check>plan": "M248,104 H258 Q266,104 266,96 V54 Q266,46 258,46 H248",
+              "review>plan": "M248,368 H274 Q284,368 284,358 V40 Q284,30 274,30 H248" },
+      labels: [] },
+  };
+  const ORDER = ["plan", "check", "go", "code", "tests", "review", "pr"];
+  const SEQ = ["plan>check", "check>plan", "plan>check", "check>go", "go>code", "code>tests", "tests>review", "review>plan",
+               "plan>check", "check>go", "go>code", "code>tests", "tests>review", "review>pr"];
+  const RH = 48;
+  let rlay = null, rnodes = {}, redges = {}, baton = null, rstate = { i: 0, phase: "dwell", t: 0, at: "plan" };
+  const caption = (title, text) => {
+    rcap.innerHTML = ""; const b = document.createElement("b"); b.textContent = title;
+    rcap.append(b, document.createTextNode(text));
+  };
+  const showNode = (id) => {
+    for (const k in rnodes) rnodes[k].classList.toggle("hot", k === id);
+    for (const k in redges) redges[k].classList.remove("hot");
+    caption(RN[id].t, RN[id].p);
+  };
+  const drawFlow = () => {
+    const name = rfig.clientWidth < 520 ? "tall" : "wide";
+    if (rlay === name) return;
+    rlay = name; const L = LAYOUTS[name];
+    [...rsvg.childNodes].forEach((n) => { if (n.nodeName !== "title") n.remove(); });
+    rsvg.setAttribute("viewBox", `0 0 ${L.vb[0]} ${L.vb[1]}`);
+    const defs = el("defs", {}, rsvg);
+    [["rah", "arrowhead"], ["rahb", "arrowhead backhead"]].forEach(([id, cls]) => {
+      const m = el("marker", { id, viewBox: "0 0 8 8", refX: 7.5, refY: 4, markerWidth: 8, markerHeight: 8, markerUnits: "userSpaceOnUse", orient: "auto" }, defs);
+      el("path", { d: "M0,0 L8,4 L0,8 z", class: cls }, m);
+    });
+    const box = (id) => { const [x, y] = L.at[id]; return { x, y, cx: x + L.w / 2, cy: y + RH / 2 }; };
+    redges = {};
+    for (let k = 0; k < ORDER.length - 1; k++) {
+      const a = box(ORDER[k]), b = box(ORDER[k + 1]);
+      let d;
+      if (a.y === b.y) d = a.x < b.x ? `M${a.x + L.w},${a.cy} L${b.x},${b.cy}` : `M${a.x},${a.cy} L${b.x + L.w},${b.cy}`;
+      else d = `M${a.cx},${a.y + RH} L${b.cx},${b.y}`;
+      redges[ORDER[k] + ">" + ORDER[k + 1]] = el("path", { d, class: "edge", "marker-end": "url(#rah)" }, rsvg);
+    }
+    for (const id in L.back) redges[id] = el("path", { d: L.back[id], class: "back", "marker-end": "url(#rahb)" }, rsvg);
+    L.labels.forEach(([t, x, y]) => { const n = el("text", { x, y, "text-anchor": "middle", class: "backlabel" }, rsvg); n.textContent = t; });
+    rnodes = {};
+    ORDER.forEach((id) => {
+      const { x, y } = box(id), n = RN[id];
+      const g = el("g", { class: "node", tabindex: "0", role: "button", "aria-label": `${n.t}: ${n.p}` }, rsvg);
+      el("rect", { x, y, width: L.w, height: RH }, g);
+      const t = el("text", { x: x + 12, y: y + 21 }, g); t.textContent = n.t;
+      const s2 = el("text", { x: x + 12, y: y + 37, class: "sub" }, g); s2.textContent = n.s;
+      const jump = () => { const i = SEQ.findIndex((e) => e.startsWith(id + ">")); rstate = { i: i < 0 ? SEQ.length : i, phase: "dwell", t: 0, at: id }; place(); showNode(id); };
+      g.addEventListener("click", jump);
+      g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); jump(); } });
+      rnodes[id] = g;
+    });
+    baton = calm ? null : el("circle", { r: 4.5, class: "dot" }, rsvg);
+    /* keep the caption's height steady: the tallest text sets it */
+    rcap.style.minHeight = "";
+    let tallest = 0;
+    [...Object.values(RN), ...Object.values(RBACK)].forEach((c) => { caption(c.t, c.p); tallest = Math.max(tallest, rcap.offsetHeight); });
+    rcap.style.minHeight = tallest + "px";
+    place(); showNode(rstate.at);
+    if (calm) for (const k in rnodes) rnodes[k].classList.remove("hot");
+    if (calm) caption("How it runs", "Each stage hands the work on; dashed lines send it back to the planner. Tap a stage for details.");
+  };
+  const place = () => {
+    if (!baton) return;
+    let pt;
+    if (rstate.phase === "move") { const p = redges[SEQ[rstate.i]]; pt = p.getPointAtLength(rstate.t * p.getTotalLength()); }
+    else { const L = LAYOUTS[rlay], [x, y] = L.at[rstate.at]; pt = { x: x + L.w - 14, y: y + 14 }; } /* rest in the corner, clear of the text */
+    baton.setAttribute("cx", pt.x); baton.setAttribute("cy", pt.y);
+    baton.classList.toggle("backdot", rstate.phase === "move" && SEQ[rstate.i] in RBACK);
+  };
+  const DWELL = 4200, DWELL_END = 6000, SPEED = 0.16; /* ms at each stage; px per ms on the way */
+  const stepFlow = (dt) => {
+    const st = rstate;
+    if (st.phase === "dwell") {
+      st.t += dt;
+      if (st.t < (st.i >= SEQ.length ? DWELL_END : DWELL)) return;
+      if (st.i >= SEQ.length) { rstate = { i: 0, phase: "dwell", t: 0, at: "plan" }; showNode("plan"); return; }
+      st.phase = "move"; st.t = 0;
+      const e = SEQ[st.i];
+      for (const k in rnodes) rnodes[k].classList.remove("hot");
+      for (const k in redges) redges[k].classList.toggle("hot", k === e);
+      if (e in RBACK) caption(RBACK[e].t, RBACK[e].p);
+    } else {
+      const len = redges[SEQ[st.i]].getTotalLength();
+      st.t += dt * SPEED / Math.max(len, 1);
+      if (st.t >= 1) { st.at = SEQ[st.i].split(">")[1]; st.i += 1; st.phase = "dwell"; st.t = 0; showNode(st.at); }
+    }
+  };
+  let flowOn = false, flowLast = 0;
+  new IntersectionObserver(([e]) => (flowOn = e.isIntersecting), { rootMargin: "50px" }).observe(rfig);
+  drawFlow();
+  addEventListener("resize", drawFlow);
+  const flowTick = (now) => { const dt = Math.min(50, now - (flowLast || now)); flowLast = now; if (flowOn) { stepFlow(dt); place(); } requestAnimationFrame(flowTick); };
+  if (!calm) requestAnimationFrame(flowTick);
 })();
 </script>
 </body>
