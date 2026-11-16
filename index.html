@@ -302,7 +302,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <div class="stage"><svg id="labsvg" viewBox="0 0 760 330" role="img" aria-labelledby="labtitle"><title id="labtitle">Diagram of the home lab: screens connect to the dashboard server on Mecca, which reads calendars and the weather station and talks to Home Assistant; Home Assistant follows live game scores and controls the lights; a phone away from home reaches the server through Tailscale.</title></svg></div>
           <aside class="panel" id="panel" aria-live="polite"></aside>
         </div>
-        <p class="alt reveal">The same thing in words: every screen in the house talks only to the dashboard server, which holds the passwords. Home Assistant controls the devices. Nothing at home is opened to the internet. Away from home, I connect through a private Tailscale network.</p>
+        <p class="alt reveal">The same thing in words: every screen in the house talks only to the dashboard server, which holds the passwords. Home Assistant controls the devices. Away from home, I connect through a private Tailscale network.</p>
 
         <div class="projects">
           <article class="card reveal">
@@ -466,9 +466,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     ipad:   { x: 20,  y: 140, t: "iPads & laptops", s: "any browser at home", k: "Screens",
               p: "Any browser on the home network gets the same live dashboard, laid out for its screen." },
     phone:  { x: 20,  y: 240, t: "Phone, away", s: "outside the house", k: "Remote",
-              p: "Away from home, my phone still reaches the server, without opening it to the internet." },
+              p: "Away from home, my phone still reaches the server over a private network." },
     ts:     { x: 210, y: 240, t: "Tailscale", s: "private network", k: "Remote access",
-              p: "A private, encrypted network between my own devices. Away from home it's how I reach the server, and nothing at home is opened to the public internet." },
+              p: "A private, encrypted network between my own devices. Away from home, it's how I reach the server." },
     dash:   { x: 400, y: 40,  t: "Dashboard server", s: "Node.js · Docker", k: "Family Dashboard",
               p: "Holds every credential, gathers calendars, weather and the state of the house, and pushes live updates to every screen at once. Built spec-first with AI-assisted engineering and 400+ automated tests." },
     ha:     { x: 400, y: 140, t: "Home Assistant", s: "virtual machine", k: "Home automation",
